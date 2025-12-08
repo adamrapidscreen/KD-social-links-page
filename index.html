@@ -720,9 +720,6 @@
           const rel = link.getAttribute('rel') || '';
           const tag = link.dataset.social;
 
-          // optional analytics placeholder
-          if (tag) console.log(`social-click:${tag}`);
-
           if (supportsVibrate) navigator.vibrate(50);
           playBeep();
 
@@ -758,7 +755,6 @@
         }
       });
 
-      console.log('Kracked Devs site loaded');
     });
   </script>
 </body>
