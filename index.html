@@ -365,6 +365,23 @@
       const logo = document.getElementById('logo-container');
       const canvas = document.getElementById('stickman-canvas');
       const ctx = canvas.getContext('2d');
+      const linksContainer = document.querySelector('.links');
+      const supportsVibrate = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+      const AudioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
+      let audioCtx;
+      const playBeep = () => {
+        if (!AudioCtx) return;
+        if (!audioCtx) audioCtx = new AudioCtx();
+        const ctx = audioCtx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.value = 0.02;
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+      };
 
       // Utilities
       const debounce = (fn, wait = 150) => {
@@ -483,15 +500,37 @@
       window.addEventListener('resize', debouncedResize);
       window.addEventListener('scroll', onScroll, { passive: true });
       prefersReducedMotion.addEventListener('change', applyMotionPreference);
-    });
 
-    // Attach click tracking for data-social links (placeholder for haptics/analytics)
-    const socialLinks = document.querySelectorAll('[data-social]');
-    socialLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        const tag = link.getAttribute('data-social');
-        console.log(`social-click:${tag}`);
-      });
+      // Delegated social click: haptics + optional beep + navigation
+      if (linksContainer) {
+        linksContainer.addEventListener('click', event => {
+          const link = event.target.closest('.social-btn');
+          if (!link) return;
+
+          const href = link.getAttribute('href');
+          const target = link.getAttribute('target');
+          const rel = link.getAttribute('rel') || '';
+          const tag = link.dataset.social;
+
+          // optional analytics placeholder
+          if (tag) console.log(`social-click:${tag}`);
+
+          if (supportsVibrate) navigator.vibrate(50);
+          playBeep();
+
+          if (href) {
+            event.preventDefault();
+            setTimeout(() => {
+              if (target === '_blank') {
+                const features = rel.includes('noopener') ? 'noopener' : '';
+                window.open(href, '_blank', features);
+              } else {
+                window.location.href = href;
+              }
+            }, 75);
+          }
+        });
+      }
     });
   </script>
 </body>
