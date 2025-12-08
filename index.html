@@ -35,18 +35,13 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg-deep);
+      background-color: #0a0a0a;
       color: var(--text-main);
       font-family: var(--font-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Subtle Grid Background */
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 30px 30px;
       overflow-x: hidden;
     }
 
@@ -59,7 +54,8 @@
       flex-direction: column;
       align-items: center;
       gap: 30px;
-      z-index: 2;
+      z-index: 1;
+      position: relative;
     }
 
     /* --- BRANDING --- */
@@ -102,7 +98,9 @@
     .link-card {
       display: flex;
       align-items: center;
-      padding: 18px 24px;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 18px 36px 18px 130px;
       background: var(--bg-card);
       border: var(--border);
       border-radius: var(--radius);
@@ -118,9 +116,10 @@
 
     .link-card i {
       font-size: 1.4rem;
-      width: 30px;
+      width: 32px;
+      min-width: 32px;
       text-align: center;
-      margin-right: 15px;
+      margin: 0;
       color: var(--accent-primary);
       transition: transform 0.3s ease;
     }
@@ -128,6 +127,8 @@
     .link-card span {
       font-size: 1.05rem;
       letter-spacing: 0.5px;
+      text-align: left;
+      white-space: nowrap;
     }
 
     /* Hover States */
@@ -160,19 +161,14 @@
       opacity: 1;
     }
 
-    /* --- FULLSCREEN BACKGROUND CANVAS --- */
-    #bg-canvas {
+    /* --- FULLSCREEN FX CANVAS --- */
+    #fx-canvas {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
+      z-index: -1;
       pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      position: relative;
-      z-index: 1;
     }
 
     /* --- RESPONSIVE --- */
@@ -185,7 +181,7 @@
 </head>
 <body>
 
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
 
   <div class="container">
     <header class="brand-header">
@@ -221,101 +217,154 @@
     </nav>
   </div>
 
-  <script src="https://unpkg.com/three@0.164.0/build/three.min.js"></script>
   <script>
-    // Fullscreen neon circuit background using Three.js + GLSL
     (() => {
-      const canvas = document.getElementById('bg-canvas');
-      if (!canvas || !window.THREE) return;
+      const canvas = document.getElementById('fx-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setClearColor(0x000000, 0);
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-      const uniforms = {
-        u_time: { value: 0 },
-        u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+      const palette = {
+        bg: '#0a0a0a',
+        green: '#00ff41',
+        gold: '#ffd700',
+        blue: '#00f3ff',
       };
 
-      const vertexShader = `
-        void main() {
-          gl_Position = vec4(position, 1.0);
-        }
-      `;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let w = 0;
+      let h = 0;
 
-      const fragmentShader = `
-        #extension GL_OES_standard_derivatives : enable
-        precision highp float;
-        uniform float u_time;
-        uniform vec2 u_resolution;
+      const particles = [];
+      const bolts = [];
+      const maxParticles = window.innerWidth < 640 ? 120 : 240;
 
-        float gridLines(vec2 p, float scale) {
-          vec2 g = abs(fract(p / scale - 0.5) - 0.5) / fwidth(p / scale);
-          float line = 1.0 - min(min(g.x, g.y), 1.0);
-          return line;
-        }
+      const rand = (min, max) => Math.random() * (max - min) + min;
 
-        void main() {
-          vec2 uv = gl_FragCoord.xy;
-          vec2 res = u_resolution;
-          vec2 p = (uv - 0.5 * res) / res.y; // normalized, aspect-correct
-
-          // Base grid
-          float grid = gridLines(uv, 18.0);
-
-          // Secondary fine grid
-          float fine = gridLines(uv, 9.0) * 0.5;
-
-          // Flow direction and speed
-          float flow = sin((uv.x + uv.y) * 0.05 + u_time * 2.5);
-          float pulse = smoothstep(0.3, 0.7, flow);
-
-          // Ripple along lines
-          float ripple = sin(length(p) * 20.0 - u_time * 6.0) * 0.35 + 0.65;
-
-          // Combine intensity
-        float intensity = (grid + fine) * (0.4 + 0.6 * ripple) + 0.18 * pulse;
-          intensity = clamp(intensity, 0.0, 1.0);
-
-          vec3 base = vec3(0.0, 0.12, 0.08); // deep background tint
-          vec3 neon = vec3(0.0, 0.84, 0.40); // neon green
-          vec3 color = base + neon * intensity;
-
-          // Subtle vignette
-          float vignette = smoothstep(1.2, 0.3, length(p));
-          color *= vignette;
-
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `;
-      const material = new THREE.ShaderMaterial({
-        uniforms,
-        vertexShader,
-        fragmentShader,
-      });
-
-      const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-      scene.add(quad);
-
-      function onResize() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        renderer.setSize(w, h, false);
-        uniforms.u_resolution.value.set(w, h);
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
 
-      function animate(t) {
-        uniforms.u_time.value = t * 0.001;
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
+      function addParticle(x, y) {
+        if (particles.length > maxParticles) particles.shift();
+        particles.push({
+          x,
+          y,
+          vx: rand(-20, 20) * 0.01,
+          vy: rand(-20, 20) * 0.01,
+          life: 0.5,
+          r: rand(3, 6),
+          color: Math.random() > 0.8 ? palette.gold : palette.green,
+        });
       }
 
-      window.addEventListener('resize', onResize);
-      onResize();
-      requestAnimationFrame(animate);
+      function spawnBolt() {
+        const edge = Math.floor(rand(0, 4));
+        let x0 = 0, y0 = 0;
+        if (edge === 0) { x0 = rand(0, w); y0 = -20; }
+        if (edge === 1) { x0 = w + 20; y0 = rand(0, h); }
+        if (edge === 2) { x0 = rand(0, w); y0 = h + 20; }
+        if (edge === 3) { x0 = -20; y0 = rand(0, h); }
+
+        // Choose a far target to ensure 50–80% screen span
+        let targetX, targetY, dist;
+        const minDist = 0.5 * Math.max(w, h);
+        const maxDist = 0.8 * Math.max(w, h);
+        do {
+          targetX = rand(w * 0.1, w * 0.9);
+          targetY = rand(h * 0.1, h * 0.9);
+          dist = Math.hypot(targetX - x0, targetY - y0);
+        } while (dist < minDist || dist > maxDist);
+
+        const points = [];
+        const segments = 18; // more kinks
+        const amp = Math.max(w, h) * 0.1; // higher jaggedness
+        for (let i = 0; i < segments; i++) {
+          const t = (i + 1) / segments;
+          const nx = x0 + (targetX - x0) * t + rand(-amp, amp);
+          const ny = y0 + (targetY - y0) * t + rand(-amp, amp);
+          points.push({ x: nx, y: ny });
+        }
+
+        bolts.push({
+          points,
+          ttl: 0.1,
+          color: [palette.green, palette.blue, palette.gold][Math.floor(rand(0, 3))],
+          width: rand(2, 4),
+        });
+      }
+
+      function scheduleBolt() {
+        setTimeout(() => {
+          spawnBolt();
+          scheduleBolt();
+        }, rand(3000, 8000));
+      }
+
+      let last = performance.now();
+      function loop(now) {
+        const dt = Math.min((now - last) / 1000, 0.033);
+        last = now;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.life -= dt;
+          if (p.life <= 0) { particles.splice(i, 1); continue; }
+          p.x += p.vx * w * dt;
+          p.y += p.vy * h * dt;
+          const alpha = Math.max(p.life / 0.5, 0);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * alpha, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // Bolts
+        for (let i = bolts.length - 1; i >= 0; i--) {
+          const b = bolts[i];
+          b.ttl -= dt;
+          if (b.ttl <= 0) { bolts.splice(i, 1); continue; }
+          ctx.strokeStyle = b.color;
+          ctx.lineWidth = b.width;
+          ctx.shadowBlur = 18;
+          ctx.shadowColor = b.color;
+          ctx.beginPath();
+          ctx.moveTo(b.points[0].x, b.points[0].y);
+          for (let j = 1; j < b.points.length; j++) {
+            ctx.lineTo(b.points[j].x, b.points[j].y);
+          }
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      function handlePointer(x, y) {
+        addParticle(x, y);
+      }
+
+      window.addEventListener('pointermove', (e) => handlePointer(e.clientX, e.clientY));
+      window.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        if (t) handlePointer(t.clientX, t.clientY);
+      }, { passive: true });
+
+      window.addEventListener('resize', resize);
+      resize();
+      scheduleBolt();
+      requestAnimationFrame(loop);
     })();
   </script>
 </body>
