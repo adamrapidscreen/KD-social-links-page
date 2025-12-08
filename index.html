@@ -225,6 +225,7 @@
 
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setClearColor(0x000000, 0);
 
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -241,13 +242,10 @@
       `;
 
       const fragmentShader = `
+        #extension GL_OES_standard_derivatives : enable
         precision highp float;
         uniform float u_time;
         uniform vec2 u_resolution;
-
-        float hash(vec2 p) {
-          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-        }
 
         float gridLines(vec2 p, float scale) {
           vec2 g = abs(fract(p / scale - 0.5) - 0.5) / fwidth(p / scale);
@@ -274,7 +272,7 @@
           float ripple = sin(length(p) * 20.0 - u_time * 6.0) * 0.35 + 0.65;
 
           // Combine intensity
-          float intensity = (grid + fine) * (0.35 + 0.65 * ripple) + 0.15 * pulse;
+        float intensity = (grid + fine) * (0.4 + 0.6 * ripple) + 0.18 * pulse;
           intensity = clamp(intensity, 0.0, 1.0);
 
           vec3 base = vec3(0.0, 0.12, 0.08); // deep background tint
