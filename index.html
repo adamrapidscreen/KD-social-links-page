@@ -364,7 +364,17 @@
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const logo = document.getElementById('logo-container');
       const canvas = document.getElementById('stickman-canvas');
-      const ctx = canvas.getContext('2d');
+      const container = document.getElementById('stickman-container');
+      let ctx = null;
+      try {
+        ctx = canvas?.getContext('2d') || null;
+      } catch (err) {
+        ctx = null;
+      }
+      if (!canvas || !container || !ctx) {
+        if (container) container.style.display = 'none';
+        return;
+      }
       const linksContainer = document.querySelector('.links');
       const supportsVibrate = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
       const AudioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
@@ -384,7 +394,7 @@
       };
 
       // Utilities
-      const debounce = (fn, wait = 150) => {
+      const debounce = (fn, wait = 250) => {
         let t;
         return (...args) => {
           clearTimeout(t);
@@ -444,180 +454,233 @@
         return (val && val.trim()) || fallback;
       };
 
-      // Stickman animation state
-      const stick = {
-        dpr: 1,
-        width: 0,
-        height: 0,
-        anchorX: 0,
-        anchorY: 0,
-        ropeLen: 80,
-        maxAngle: Math.PI / 3, // 60deg
-        swingDuration: 2000,
-        traversalSpeed: 0,
-        swingPauseUntil: 0,
-        nextDisappearAt: 0,
-        invisibleUntil: 0,
-        visible: true,
-        lastTime: 0,
-        rafId: null,
-        color: getCssVar('--accent-green', '#00d966')
-      };
-
       const randInRange = (min, max) => Math.random() * (max - min) + min;
 
-      const setupCanvas = () => {
-        const rect = canvas.getBoundingClientRect();
-        stick.dpr = Math.max(window.devicePixelRatio || 1, 1);
-        stick.width = rect.width;
-        stick.height = rect.height;
-        canvas.width = rect.width * stick.dpr;
-        canvas.height = rect.height * stick.dpr;
-        ctx.setTransform(stick.dpr, 0, 0, stick.dpr, 0, 0);
-        stick.anchorY = stick.height * 0.15;
-        stick.ropeLen = Math.max(50, Math.min(stick.height * 0.6, 90));
-        stick.traversalSpeed = stick.width / 8000; // ~8s to cross
-      };
-
-      const resetDisappear = now => {
-        stick.nextDisappearAt = now + randInRange(15000, 20000);
-      };
-
-      const handleVisibility = now => {
-        if (stick.visible && now >= stick.nextDisappearAt) {
-          stick.visible = false;
-          stick.invisibleUntil = now + randInRange(2000, 4000);
-        } else if (!stick.visible && now >= stick.invisibleUntil) {
-          stick.visible = true;
-          stick.anchorX = Math.random() < 0.5 ? stick.width * 0.15 : stick.width * 0.85;
-          stick.swingPauseUntil = now + randInRange(2000, 5000);
-          resetDisappear(now);
-        }
-      };
-
-      const resetTraversal = now => {
-        stick.anchorX = 0;
-        stick.swingPauseUntil = now + randInRange(2000, 5000);
-      };
-
-      const drawStickman = (angleRad, alpha = 1) => {
-        ctx.clearRect(0, 0, stick.width, stick.height);
-        if (!stick.visible || alpha === 0) return;
-
-        const headR = 8;
-        const bodyLen = 20;
-        const armLen = 12;
-        const legLen = 16;
-        const anchorX = stick.anchorX;
-        const anchorY = stick.anchorY;
-
-        // Pendulum endpoint (head center)
-        const headX = anchorX + Math.sin(angleRad) * stick.ropeLen;
-        const headY = anchorY + Math.cos(angleRad) * stick.ropeLen;
-        const shoulderY = headY + headR + 2;
-        const hipY = headY + headR + bodyLen;
-
-        ctx.strokeStyle = stick.color;
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.globalAlpha = alpha;
-
-        // Rope/Web
-        ctx.beginPath();
-        ctx.moveTo(anchorX, anchorY);
-        ctx.lineTo(headX, headY);
-        ctx.stroke();
-
-        // Head
-        ctx.beginPath();
-        ctx.arc(headX, headY, headR, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Body
-        ctx.beginPath();
-        ctx.moveTo(headX, headY + headR);
-        ctx.lineTo(headX, hipY);
-        ctx.stroke();
-
-        // Arms
-        ctx.beginPath();
-        ctx.moveTo(headX, shoulderY);
-        ctx.lineTo(headX - armLen, shoulderY + armLen * 0.5);
-        ctx.moveTo(headX, shoulderY);
-        ctx.lineTo(headX + armLen, shoulderY + armLen * 0.5);
-        ctx.stroke();
-
-        // Legs
-        ctx.beginPath();
-        ctx.moveTo(headX, hipY);
-        ctx.lineTo(headX - legLen, hipY + legLen * 0.8);
-        ctx.moveTo(headX, hipY);
-        ctx.lineTo(headX + legLen, hipY + legLen * 0.8);
-        ctx.stroke();
-
-        ctx.globalAlpha = 1;
-      };
-
-      const animate = now => {
-        if (prefersReducedMotion.matches) {
-          drawStickman(0);
-          return;
+      class StickmanAnimator {
+        constructor(canvas, color) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext('2d');
+          this.color = color;
+          this.dpr = 1;
+          this.width = 0;
+          this.height = 0;
+          this.anchorX = 0;
+          this.anchorY = 50;
+          this.ropeLen = 80;
+          this.maxAngle = Math.PI / 3; // 60deg
+          this.swingDuration = 2000;
+          this.traverseDuration = 8000;
+          this.traversalSpeed = 0;
+          this.swingPauseUntil = 0;
+          this.nextDisappearAt = 0;
+          this.invisibleUntil = 0;
+          this.visible = true;
+          this.lastTime = 0;
+          this.rafId = null;
+          this.reduced = false;
+          this.skylineCache = null;
+          this.offscreen = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : null;
+          this._tick = this._tick.bind(this);
+          this.resize();
+          this._resetDisappear(performance.now());
         }
 
-        if (!stick.lastTime) {
-          stick.lastTime = now;
-          resetDisappear(now);
+        resize() {
+          const rect = this.canvas.getBoundingClientRect();
+          this.dpr = Math.max(window.devicePixelRatio || 1, 1);
+          this.width = rect.width;
+          this.height = rect.height;
+          this.canvas.width = Math.max(1, Math.round(rect.width * this.dpr));
+          this.canvas.height = Math.max(1, Math.round(rect.height * this.dpr));
+          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+          this.anchorY = Math.max(40, this.height * 0.15);
+          this.ropeLen = Math.max(50, Math.min(this.height * 0.6, 90));
+          this.traversalSpeed = this.width / this.traverseDuration;
+          this._buildSkylineCache();
         }
-        const delta = now - stick.lastTime;
-        stick.lastTime = now;
 
-        handleVisibility(now);
+        _buildSkylineCache() {
+          if (!this.width || !this.height) return;
+          const buffer = this.offscreen || document.createElement('canvas');
+          buffer.width = this.width;
+          buffer.height = this.height;
+          const bctx = buffer.getContext('2d');
+          bctx.clearRect(0, 0, this.width, this.height);
+          bctx.fillStyle = 'rgba(0, 217, 102, 0.2)';
+          // Twin towers minimal rectangles
+          bctx.fillRect(this.width * 0.42, this.height * 0.25, this.width * 0.04, this.height * 0.75);
+          bctx.fillRect(this.width * 0.54, this.height * 0.22, this.width * 0.04, this.height * 0.78);
+          bctx.fillRect(this.width * 0.445, this.height * 0.18, this.width * 0.01, this.height * 0.07);
+          bctx.fillRect(this.width * 0.56, this.height * 0.16, this.width * 0.01, this.height * 0.08);
+          this.skylineCache = buffer;
+        }
 
-        if (stick.visible) {
-          stick.anchorX += stick.traversalSpeed * delta;
-          if (stick.anchorX > stick.width) {
-            resetTraversal(now);
+        _resetDisappear(now) {
+          this.nextDisappearAt = now + randInRange(15000, 20000);
+        }
+
+        _resetTraversal(now) {
+          this.anchorX = 0;
+          this.swingPauseUntil = now + randInRange(2000, 5000);
+        }
+
+        _handleVisibility(now) {
+          if (this.visible && now >= this.nextDisappearAt) {
+            this.visible = false;
+            this.invisibleUntil = now + randInRange(2000, 4000);
+          } else if (!this.visible && now >= this.invisibleUntil) {
+            this.visible = true;
+            this.anchorX = Math.random() < 0.5 ? this.width * 0.15 : this.width * 0.85;
+            this.swingPauseUntil = now + randInRange(2000, 5000);
+            this._resetDisappear(now);
           }
         }
 
-        const swinging = now >= stick.swingPauseUntil;
-        const angleRad = swinging
-          ? Math.sin((now % stick.swingDuration) * Math.PI / stick.swingDuration) * stick.maxAngle
-          : 0;
+        update(delta, now) {
+          this._handleVisibility(now);
 
-        drawStickman(angleRad, stick.visible ? 1 : 0);
-        stick.rafId = requestAnimationFrame(animate);
-      };
+          if (this.visible) {
+            this.anchorX += this.traversalSpeed * delta;
+            if (this.anchorX > this.width) {
+              this._resetTraversal(now);
+            }
+          }
 
-      const startStickman = () => {
-        if (stick.rafId || prefersReducedMotion.matches) return;
-        stick.lastTime = 0;
-        stick.visible = true;
-        stick.anchorX = 0;
-        stick.swingPauseUntil = performance.now() + randInRange(2000, 5000);
-        stick.rafId = requestAnimationFrame(animate);
-      };
-
-      const stopStickman = () => {
-        if (stick.rafId) {
-          cancelAnimationFrame(stick.rafId);
-          stick.rafId = null;
+          const swinging = now >= this.swingPauseUntil;
+          this.angle = swinging
+            ? Math.sin((now % this.swingDuration) * Math.PI / this.swingDuration) * this.maxAngle
+            : 0;
         }
-      };
 
-      const drawStaticStickman = () => {
-        stopStickman();
-        drawStickman(0);
-      };
+        draw(alpha = 1) {
+          const ctx = this.ctx;
+          ctx.clearRect(0, 0, this.width, this.height);
+          if (this.skylineCache) {
+            ctx.drawImage(this.skylineCache, 0, 0, this.width, this.height);
+          }
+          const opacity = this.visible ? alpha : 0;
+          if (opacity === 0) return;
+
+          const headR = 8;
+          const bodyLen = 20;
+          const armLen = 12;
+          const legLen = 16;
+          const anchorX = this.anchorX;
+          const anchorY = this.anchorY;
+          const angle = this.angle || 0;
+
+          const sinA = Math.sin(angle);
+          const cosA = Math.cos(angle);
+          const headX = anchorX + sinA * this.ropeLen;
+          const headY = anchorY + cosA * this.ropeLen;
+          const shoulderY = headY + headR + 2;
+          const hipY = headY + headR + bodyLen;
+
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.globalAlpha = opacity;
+
+          // Rope/Web
+          ctx.beginPath();
+          ctx.moveTo(anchorX, anchorY);
+          ctx.lineTo(headX, headY);
+          ctx.stroke();
+
+          // Head
+          ctx.beginPath();
+          ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Body
+          ctx.beginPath();
+          ctx.moveTo(headX, headY + headR);
+          ctx.lineTo(headX, hipY);
+          ctx.stroke();
+
+          // Arms
+          ctx.beginPath();
+          ctx.moveTo(headX, shoulderY);
+          ctx.lineTo(headX - armLen, shoulderY + armLen * 0.5);
+          ctx.moveTo(headX, shoulderY);
+          ctx.lineTo(headX + armLen, shoulderY + armLen * 0.5);
+          ctx.stroke();
+
+          // Legs
+          ctx.beginPath();
+          ctx.moveTo(headX, hipY);
+          ctx.lineTo(headX - legLen, hipY + legLen * 0.8);
+          ctx.moveTo(headX, hipY);
+          ctx.lineTo(headX + legLen, hipY + legLen * 0.8);
+          ctx.stroke();
+
+          ctx.globalAlpha = 1;
+        }
+
+        _tick(now) {
+          if (this.reduced) {
+            this.draw(1);
+            return;
+          }
+          if (!this.lastTime) {
+            this.lastTime = now;
+            this._resetTraversal(now);
+          }
+          const delta = now - this.lastTime;
+          this.lastTime = now;
+          this.update(delta, now);
+          this.draw(1);
+          this.rafId = requestAnimationFrame(this._tick);
+        }
+
+        start() {
+          if (this.reduced || this.rafId) return;
+          this.lastTime = 0;
+          this.rafId = requestAnimationFrame(this._tick);
+        }
+
+        stop() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+        }
+
+        drawStatic() {
+          this.stop();
+          this.visible = true;
+          this.angle = 0;
+          this.draw(1);
+        }
+
+        setReducedMotion(flag) {
+          this.reduced = flag;
+          if (flag) {
+            this.drawStatic();
+          } else {
+            this.start();
+          }
+        }
+      }
+
+      const stickman = new StickmanAnimator(canvas, getCssVar('--accent-green', '#00d966'));
+      let lastW = 0;
+      let lastH = 0;
 
       const resizeCanvas = () => {
-        setupCanvas();
+        const rect = container.getBoundingClientRect();
+        const changed = rect.width !== lastW || rect.height !== lastH;
+        if (!changed) return;
+        lastW = rect.width;
+        lastH = rect.height;
+        stickman.resize();
         if (prefersReducedMotion.matches) {
-          drawStaticStickman();
+          stickman.drawStatic();
         }
+        stickman._buildSkylineCache();
       };
 
-      const debouncedResize = debounce(resizeCanvas, 150);
+      const debouncedResize = debounce(resizeCanvas, 250);
 
       // Optional scroll handler placeholder (throttled) for future parallax
       const onScroll = throttle(() => {
@@ -625,13 +688,13 @@
       }, 200);
 
       const applyMotionPreference = () => {
-        if (prefersReducedMotion.matches && logo) {
+        const reduced = prefersReducedMotion.matches;
+        stickman.setReducedMotion(reduced);
+        if (logo && reduced) {
           logo.classList.remove('animated');
           logo.style.animation = 'none';
-          drawStaticStickman();
         } else {
           initLogoAnimations();
-          startStickman();
         }
       };
 
@@ -639,7 +702,8 @@
       resizeCanvas();
       initLazyBackgrounds();
       initLogoAnimations();
-      if (!prefersReducedMotion.matches) startStickman();
+      if (!prefersReducedMotion.matches) stickman.start();
+      else stickman.drawStatic();
 
       window.addEventListener('resize', debouncedResize);
       window.addEventListener('scroll', onScroll, { passive: true });
@@ -674,7 +738,27 @@
             }, 75);
           }
         });
+
+        linksContainer.addEventListener('keydown', event => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          const link = event.target.closest('.social-btn');
+          if (!link) return;
+          if (supportsVibrate) navigator.vibrate(50);
+          playBeep();
+        });
       }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stickman.stop();
+        } else if (!prefersReducedMotion.matches) {
+          stickman.start();
+        } else {
+          stickman.drawStatic();
+        }
+      });
+
+      console.log('Kracked Devs site loaded');
     });
   </script>
 </body>
