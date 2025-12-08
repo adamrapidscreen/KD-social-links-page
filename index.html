@@ -15,8 +15,6 @@
   <style>
     /* --- VARIABLES & RESET --- */
     :root {
-      /* Palette based on your Logo */
-      --bg-deep: #050810;
       --bg-card: rgba(20, 30, 50, 0.4);
       --bg-card-hover: rgba(0, 217, 102, 0.1);
       
@@ -26,7 +24,6 @@
       --text-muted: #8892b0;
       
       --border: 1px solid rgba(255, 255, 255, 0.08);
-      --border-accent: 1px solid var(--accent-primary);
       
       --radius: 12px;
       --font-main: 'Space Grotesk', sans-serif;
@@ -224,11 +221,11 @@
       const ctx = canvas.getContext('2d');
 
       const palette = {
-        bg: '#0a0a0a',
         green: '#00ff41',
         gold: '#ffd700',
         blue: '#00f3ff',
       };
+      const boltColors = [palette.green, palette.blue, palette.gold];
 
       let dpr = Math.min(window.devicePixelRatio || 1, 2);
       let w = 0;
@@ -295,7 +292,7 @@
         bolts.push({
           points,
           ttl: 0.1,
-          color: [palette.green, palette.blue, palette.gold][Math.floor(rand(0, 3))],
+          color: boltColors[Math.floor(rand(0, boltColors.length))],
           width: rand(2, 4),
         });
       }
