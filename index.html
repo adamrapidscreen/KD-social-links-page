@@ -156,7 +156,6 @@
       place-items: center;
       overflow: hidden;
       position: relative;
-      animation: breathe 4s ease-in-out infinite;
       will-change: transform, opacity;
     }
     .logo-display::before {
@@ -165,11 +164,13 @@
       inset: 0;
       background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent);
       transform: translateX(-100%);
-      animation: shimmer 3s ease-in-out infinite;
       pointer-events: none;
       will-change: transform;
     }
     .logo-display svg { width: 70%; height: 70%; }
+
+    .logo-display.animated { animation: breathe 4s ease-in-out infinite; }
+    .logo-display.animated::before { animation: shimmer 3s ease-in-out infinite; }
 
     @keyframes breathe {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -251,7 +252,6 @@
       width: 100%;
       height: 100%;
       display: block;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0%200%20800%20200'%3E%3Cpath fill='%2300d966' fill-opacity='0.2' d='M350 20h36v160h-36zM414 12h36v168h-36zM368 0h8v20h-8zM432 0h8v24h-8z'/%3E%3C/svg%3E");
       background-position: bottom center;
       background-repeat: no-repeat;
       background-size: contain;
@@ -284,6 +284,11 @@
         background-color: var(--bg-primary);
         color: var(--text-primary);
       }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .logo-display { animation: none !important; }
+      .logo-display::before { animation: none !important; }
     }
 
     /* Desktop hover pause */
@@ -350,11 +355,136 @@
     </main>
 
     <div id="stickman-container" aria-label="Stickman animation">
-      <canvas id="stickman-canvas"></canvas>
+      <canvas id="stickman-canvas" data-bg-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0%200%20800%20200'%3E%3Cpath fill='%2300d966' fill-opacity='0.2' d='M350 20h36v160h-36zM414 12h36v168h-36zM368 0h8v20h-8zM432 0h8v24h-8z'/%3E%3C/svg%3E"></canvas>
     </div>
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const logo = document.getElementById('logo-container');
+      const canvas = document.getElementById('stickman-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Utilities
+      const debounce = (fn, wait = 150) => {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      };
+      const throttle = (fn, wait = 200) => {
+        let inFlight = false;
+        return (...args) => {
+          if (inFlight) return;
+          inFlight = true;
+          fn(...args);
+          setTimeout(() => { inFlight = false; }, wait);
+        };
+      };
+
+      // Logo animations: gate by reduced motion and start after load
+      const initLogoAnimations = () => {
+        if (!logo || prefersReducedMotion.matches) return;
+        requestAnimationFrame(() => logo.classList.add('animated'));
+
+        // Desktop hover pause for extra safety (CSS already handles it)
+        if (window.matchMedia('(hover: hover)').matches) {
+          logo.addEventListener('mouseenter', () => {
+            logo.style.animationPlayState = 'paused';
+          });
+          logo.addEventListener('mouseleave', () => {
+            logo.style.animationPlayState = 'running';
+          });
+        }
+      };
+
+      // Lazy-load background images (data-bg-src)
+      const initLazyBackgrounds = () => {
+        const targets = document.querySelectorAll('[data-bg-src]');
+        if (!targets.length) return;
+
+        const onIntersect = (entries, observer) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const bg = el.getAttribute('data-bg-src');
+            if (bg) {
+              el.style.backgroundImage = `url("${bg}")`;
+              el.removeAttribute('data-bg-src');
+            }
+            observer.unobserve(el);
+          });
+        };
+
+        const observer = new IntersectionObserver(onIntersect, { rootMargin: '150px' });
+        targets.forEach(el => observer.observe(el));
+      };
+
+      // Stickman renderer (unchanged drawing, with debounced resize)
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const mid = canvas.width / 2;
+        const baseY = canvas.height * 0.75;
+        ctx.strokeStyle = '#00ff7a';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        // head
+        ctx.beginPath();
+        ctx.arc(mid, baseY - 70, 18, 0, Math.PI * 2);
+        ctx.stroke();
+        // body
+        ctx.beginPath();
+        ctx.moveTo(mid, baseY - 52);
+        ctx.lineTo(mid, baseY - 10);
+        ctx.stroke();
+        // arms
+        ctx.beginPath();
+        ctx.moveTo(mid - 26, baseY - 40);
+        ctx.lineTo(mid + 26, baseY - 30);
+        ctx.stroke();
+        // legs
+        ctx.beginPath();
+        ctx.moveTo(mid, baseY - 10);
+        ctx.lineTo(mid - 20, baseY + 14);
+        ctx.moveTo(mid, baseY - 10);
+        ctx.lineTo(mid + 22, baseY + 12);
+        ctx.stroke();
+      };
+
+      const resizeCanvas = () => {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        draw();
+      };
+
+      const debouncedResize = debounce(resizeCanvas, 150);
+
+      // Optional scroll handler placeholder (throttled) for future parallax
+      const onScroll = throttle(() => {
+        // reserved for future parallax/metrics work
+      }, 200);
+
+      const applyMotionPreference = () => {
+        if (prefersReducedMotion.matches && logo) {
+          logo.classList.remove('animated');
+          logo.style.animation = 'none';
+        } else {
+          initLogoAnimations();
+        }
+      };
+
+      // Init
+      resizeCanvas();
+      initLazyBackgrounds();
+      initLogoAnimations();
+
+      window.addEventListener('resize', debouncedResize);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      prefersReducedMotion.addEventListener('change', applyMotionPreference);
+    });
+
     // Attach click tracking for data-social links (placeholder for haptics/analytics)
     const socialLinks = document.querySelectorAll('[data-social]');
     socialLinks.forEach(link => {
@@ -363,46 +493,6 @@
         console.log(`social-click:${tag}`);
       });
     });
-
-    // Minimal stickman doodle renderer
-    const canvas = document.getElementById('stickman-canvas');
-    const ctx = canvas.getContext('2d');
-    const resize = () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      draw();
-    };
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const mid = canvas.width / 2;
-      const baseY = canvas.height * 0.75;
-      ctx.strokeStyle = '#00ff7a';
-      ctx.lineWidth = 4;
-      ctx.lineCap = 'round';
-      // head
-      ctx.beginPath();
-      ctx.arc(mid, baseY - 70, 18, 0, Math.PI * 2);
-      ctx.stroke();
-      // body
-      ctx.beginPath();
-      ctx.moveTo(mid, baseY - 52);
-      ctx.lineTo(mid, baseY - 10);
-      ctx.stroke();
-      // arms
-      ctx.beginPath();
-      ctx.moveTo(mid - 26, baseY - 40);
-      ctx.lineTo(mid + 26, baseY - 30);
-      ctx.stroke();
-      // legs
-      ctx.beginPath();
-      ctx.moveTo(mid, baseY - 10);
-      ctx.lineTo(mid - 20, baseY + 14);
-      ctx.moveTo(mid, baseY - 10);
-      ctx.lineTo(mid + 22, baseY + 12);
-      ctx.stroke();
-    };
-    window.addEventListener('resize', resize);
-    resize();
   </script>
 </body>
 </html>
