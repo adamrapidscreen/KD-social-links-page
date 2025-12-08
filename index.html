@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kracked Devs - Digital solutions agency">
+  <meta name="theme-color" content="#00d966">
+  <title>Kracked Devs | Social Links</title>
+
+  <!-- Font Awesome (only external dep) -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-rXnYZyXcXwjlzAIXazhbugzuDUFcPRl1BDpRP70dNDO7xjMnIKh4j/wcgUp3NEPoPFcAckS4iigFsMNB7gYing==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <style>
+    /* Theme tokens (digital noir) */
+    :root {
+      /* Colors */
+      --bg-primary: #0a0e27;
+      --bg-surface: #0f1a3a;
+      --accent-green: #00d966;
+      --accent-green-strong: #00ff7a;
+      --accent-gold: #d4a574;
+      --text-primary: #e5e5e5;
+      --text-secondary: #999999;
+
+      /* Legacy aliases used in layout */
+      --bg: var(--bg-primary);
+      --surface: var(--bg-surface);
+      --primary: var(--accent-green);
+      --primary-strong: var(--accent-green-strong);
+      --gold: var(--accent-gold);
+      --text: var(--text-primary);
+      --text-muted: var(--text-secondary);
+
+      /* Typography */
+      --fs-h1: clamp(28px, 5vw, 48px);
+      --fs-h2: clamp(20px, 4vw, 32px);
+      --fs-p: clamp(14px, 2vw, 16px);
+
+      /* Spacing scale (8px base) */
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 40px;
+      --space-6: 48px;
+
+      /* Animation durations */
+      --anim-fast: 150ms;
+      --anim-normal: 300ms;
+      --anim-slow: 500ms;
+
+      /* Z-index scale */
+      --z-base: 1;
+      --z-content: 10;
+      --z-modal: 100;
+      --z-fixed: 1000;
+
+      --radius: 14px;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+    }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 255, 122, 0.08), transparent 36%),
+                  radial-gradient(circle at 80% 0%, rgba(212, 165, 116, 0.12), transparent 32%),
+                  var(--bg-primary);
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Typography */
+    body { line-height: 1.5; }
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.2;
+      font-weight: 600;
+    }
+    h1 { font-size: var(--fs-h1); }
+    h2 { font-size: var(--fs-h2); }
+    p  { font-size: var(--fs-p); }
+
+    /* Focus states */
+    a:focus-visible,
+    button:focus-visible,
+    .link-btn:focus-visible {
+      outline: 2px solid var(--accent-green);
+      outline-offset: 2px;
+    }
+
+    /* Layout */
+    .wrapper {
+      width: min(100%, 800px);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: clamp(20px, 4vw, 40px);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .logo-mark {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 16px 36px rgba(0, 217, 102, 0.35);
+    }
+    .logo-mark svg { width: 44px; height: 44px; }
+    .tagline {
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+      margin: 0;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .logo-display {
+      width: 200px;
+      aspect-ratio: 1;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(0, 217, 102, 0.18), rgba(15, 26, 58, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .logo-display svg { width: 70%; height: 70%; }
+
+    .links {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .link-btn {
+      width: 100%;
+      max-width: 480px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 600;
+      transition: transform var(--anim-fast) ease, box-shadow var(--anim-fast) ease, border-color var(--anim-fast) ease, background var(--anim-fast) ease;
+      box-shadow: var(--shadow);
+    }
+    .link-btn:hover,
+    .link-btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .link-btn i {
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+    .link-btn[data-social="website"] i { color: var(--gold); }
+    .link-btn[data-social="threads"] i { color: #ffffff; }
+    .link-btn[data-social="instagram"] {
+      background: linear-gradient(135deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .link-btn[data-social="instagram"] i { color: #fff; }
+
+    footer {
+      position: relative;
+      height: 200px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(15, 26, 58, 0.65), rgba(10, 14, 39, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    #stickman-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .skyline {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    @media (min-width: 640px) {
+      body { padding: 30px; }
+      .wrapper { width: min(100%, 600px); }
+      .logo-display { width: 240px; }
+      .link-btn { max-width: 520px; }
+      footer { height: 250px; }
+    }
+    @media (min-width: 960px) {
+      body { padding: 40px; }
+      .wrapper { width: min(100%, 800px); }
+      .logo-display { width: 250px; }
+      .link-btn { max-width: 480px; }
+    }
+
+    /* Dark preference support (no light variant needed) */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 120 120" role="presentation">
+          <rect x="18" y="18" width="84" height="84" rx="18" fill="rgba(10,14,39,0.6)" stroke="rgba(255,255,255,0.12)" stroke-width="3"></rect>
+          <path d="M38 78 L38 42 L52 58 L68 42 L68 78" stroke="#00ff7a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+          <circle cx="82" cy="60" r="9" fill="#d4a574"></circle>
+        </svg>
+      </div>
+      <div>
+        <h1 style="margin:0;">Kracked Devs</h1>
+        <p class="tagline">Cracking Code. Crafting Innovation.</p>
+      </div>
+    </header>
+
+    <main>
+      <div class="logo-display" aria-hidden="true">
+        <svg viewBox="0 0 160 160" role="presentation">
+          <defs>
+            <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00d966" stop-opacity="0.9"></stop>
+              <stop offset="100%" stop-color="#0f1a3a" stop-opacity="0.95"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="8" y="8" width="144" height="144" rx="26" fill="url(#lg)" stroke="rgba(255,255,255,0.08)" stroke-width="4"></rect>
+          <path d="M52 108 L52 52 L80 80 L108 52 L108 108" stroke="#e5e5e5" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+          <circle cx="80" cy="80" r="10" fill="#d4a574"></circle>
+        </svg>
+      </div>
+
+      <nav class="links" aria-label="Social links">
+        <a class="link-btn" data-social="website" href="https://krackeddevs.com" target="_blank" rel="noreferrer noopener">
+          <i class="fa-solid fa-circle-nodes"></i>
+          <span>Website</span>
+        </a>
+        <a class="link-btn" data-social="x" href="https://x.com" target="_blank" rel="noreferrer noopener">
+          <i class="fa-brands fa-x-twitter"></i>
+          <span>X / Twitter</span>
+        </a>
+        <a class="link-btn" data-social="discord" href="https://discord.com" target="_blank" rel="noreferrer noopener">
+          <i class="fa-brands fa-discord"></i>
+          <span>Discord</span>
+        </a>
+        <a class="link-btn" data-social="threads" href="https://www.threads.net" target="_blank" rel="noreferrer noopener">
+          <i class="fa-brands fa-threads"></i>
+          <span>Threads</span>
+        </a>
+        <a class="link-btn" data-social="instagram" href="https://www.instagram.com" target="_blank" rel="noreferrer noopener">
+          <i class="fa-brands fa-instagram"></i>
+          <span>Instagram</span>
+        </a>
+      </nav>
+    </main>
+
+    <footer aria-label="Footer visual">
+      <canvas id="stickman-canvas"></canvas>
+      <svg class="skyline" viewBox="0 0 800 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="800" height="300" fill="url(#night)"></rect>
+        <defs>
+          <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0f1a3a" stop-opacity="0.7"></stop>
+            <stop offset="100%" stop-color="#0a0e27" stop-opacity="0.95"></stop>
+          </linearGradient>
+        </defs>
+        <g fill="#0c1435">
+          <rect x="60" y="140" width="80" height="160"></rect>
+          <rect x="170" y="110" width="70" height="190"></rect>
+          <rect x="260" y="90" width="90" height="210"></rect>
+          <rect x="380" y="70" width="70" height="230"></rect>
+          <rect x="470" y="90" width="86" height="210"></rect>
+          <rect x="580" y="120" width="70" height="180"></rect>
+          <rect x="670" y="150" width="60" height="150"></rect>
+          <!-- Twin Towers silhouettes -->
+          <rect x="335" y="40" width="34" height="260" fill="#0d183a"></rect>
+          <rect x="495" y="36" width="34" height="264" fill="#0d183a"></rect>
+          <rect x="347" y="26" width="10" height="24" fill="#00d966"></rect>
+          <rect x="507" y="22" width="10" height="24" fill="#00d966"></rect>
+        </g>
+      </svg>
+    </footer>
+  </div>
+
+  <script>
+    // Attach click tracking for data-social links (placeholder for haptics/analytics)
+    const socialLinks = document.querySelectorAll('[data-social]');
+    socialLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        const tag = link.getAttribute('data-social');
+        console.log(`social-click:${tag}`);
+      });
+    });
+
+    // Minimal stickman doodle renderer
+    const canvas = document.getElementById('stickman-canvas');
+    const ctx = canvas.getContext('2d');
+    const resize = () => {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      draw();
+    };
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const mid = canvas.width / 2;
+      const baseY = canvas.height * 0.75;
+      ctx.strokeStyle = '#00ff7a';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      // head
+      ctx.beginPath();
+      ctx.arc(mid, baseY - 70, 18, 0, Math.PI * 2);
+      ctx.stroke();
+      // body
+      ctx.beginPath();
+      ctx.moveTo(mid, baseY - 52);
+      ctx.lineTo(mid, baseY - 10);
+      ctx.stroke();
+      // arms
+      ctx.beginPath();
+      ctx.moveTo(mid - 26, baseY - 40);
+      ctx.lineTo(mid + 26, baseY - 30);
+      ctx.stroke();
+      // legs
+      ctx.beginPath();
+      ctx.moveTo(mid, baseY - 10);
+      ctx.lineTo(mid - 20, baseY + 14);
+      ctx.moveTo(mid, baseY - 10);
+      ctx.lineTo(mid + 22, baseY + 12);
+      ctx.stroke();
+    };
+    window.addEventListener('resize', resize);
+    resize();
+  </script>
+</body>
+</html>
