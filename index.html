@@ -1,761 +1,320 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Meta -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Kracked Devs - Digital solutions agency">
-  <meta name="theme-color" content="#00d966">
-  <title>Kracked Devs | Social Links</title>
+  <title>Kracked Devs | Link in Bio</title>
 
-  <!-- Font Awesome (only external dep) -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-rXnYZyXcXwjlzAIXazhbugzuDUFcPRl1BDpRP70dNDO7xjMnIKh4j/wcgUp3NEPoPFcAckS4iigFsMNB7gYing==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <style>
-    /* Theme tokens (digital noir) */
+    /* --- VARIABLES & RESET --- */
     :root {
-      /* Colors */
-      --bg-primary: #0a0e27;
-      --bg-surface: #0f1a3a;
-      --accent-green: #00d966;
-      --accent-green-light: #2ef793;
-      --accent-green-strong: #00ff7a;
-      --accent-gold: #d4a574;
-      --bg-secondary: var(--bg-surface);
-      --text-primary: #e5e5e5;
-      --text-secondary: #999999;
-
-      /* Legacy aliases used in layout */
-      --bg: var(--bg-primary);
-      --surface: var(--bg-surface);
-      --primary: var(--accent-green);
-      --primary-strong: var(--accent-green-strong);
-      --gold: var(--accent-gold);
-      --text: var(--text-primary);
-      --text-muted: var(--text-secondary);
-
-      /* Typography */
-      --fs-h1: clamp(28px, 5vw, 48px);
-      --fs-h2: clamp(20px, 4vw, 32px);
-      --fs-p: clamp(14px, 2vw, 16px);
-
-      /* Spacing scale (8px base) */
-      --space-1: 8px;
-      --space-2: 16px;
-      --space-3: 24px;
-      --space-4: 32px;
-      --space-5: 40px;
-      --space-6: 48px;
-
-      /* Animation durations */
-      --anim-fast: 150ms;
-      --anim-normal: 300ms;
-      --anim-slow: 500ms;
-
-      /* Z-index scale */
-      --z-base: 1;
-      --z-content: 10;
-      --z-modal: 100;
-      --z-fixed: 1000;
-
-      --radius: 14px;
-      --shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+      /* Palette based on your Logo */
+      --bg-deep: #050810;
+      --bg-card: rgba(20, 30, 50, 0.4);
+      --bg-card-hover: rgba(0, 217, 102, 0.1);
+      
+      --accent-primary: #00d966; /* The Green from your logo */
+      --accent-glow: rgba(0, 217, 102, 0.4);
+      --text-main: #ffffff;
+      --text-muted: #8892b0;
+      
+      --border: 1px solid rgba(255, 255, 255, 0.08);
+      --border-accent: 1px solid var(--accent-primary);
+      
+      --radius: 12px;
+      --font-main: 'Space Grotesk', sans-serif;
     }
 
-    /* Base */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      -webkit-font-smoothing: antialiased;
-      font-size: 16px;
-    }
+
     body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font-main);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
+      /* Subtle Grid Background */
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
       overflow-x: hidden;
-      background: radial-gradient(circle at 20% 20%, rgba(0, 255, 122, 0.08), transparent 36%),
-                  radial-gradient(circle at 80% 0%, rgba(212, 165, 116, 0.12), transparent 32%),
-                  var(--bg-primary);
-    }
-    a { color: inherit; text-decoration: none; }
-
-    /* Typography */
-    body { line-height: 1.5; }
-    h1, h2, h3, h4, h5, h6 {
-      line-height: 1.2;
-      font-weight: 600;
-    }
-    h1 { font-size: var(--fs-h1); }
-    h2 { font-size: var(--fs-h2); }
-    p  { font-size: var(--fs-p); }
-
-    /* Focus states */
-    a:focus-visible,
-    button:focus-visible,
-    .social-btn:focus-visible {
-      outline: 2px solid var(--accent-green);
-      outline-offset: 2px;
     }
 
-    /* Layout */
-    .wrapper {
-      width: min(100%, 800px);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.2));
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 18px;
-      padding: clamp(20px, 4vw, 40px);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
-
-    header {
+    /* --- LAYOUT CONTAINER --- */
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 60px 20px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      text-align: center;
+      gap: 30px;
+      z-index: 2;
     }
 
-    .logo-mark {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-      display: grid;
-      place-items: center;
-      box-shadow: 0 16px 36px rgba(0, 217, 102, 0.35);
+    /* --- BRANDING --- */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 10px;
     }
-    .logo-mark svg { width: 44px; height: 44px; }
+
+    .logo-img {
+      width: 180px; /* Adjust size as needed */
+      height: auto;
+      display: block;
+      margin: 0 auto 15px;
+      /* CRITICAL for pixel art logos: keeps edges sharp */
+      image-rendering: pixelated; 
+      filter: drop-shadow(0 0 15px var(--accent-glow));
+      animation: float 6s ease-in-out infinite;
+    }
+
     .tagline {
       color: var(--text-muted);
-      letter-spacing: 0.01em;
-      margin: 0;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-    .logo-display {
-      width: 200px;
-      aspect-ratio: 1;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(0, 217, 102, 0.18), rgba(15, 26, 58, 0.95));
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      position: relative;
-      will-change: transform, opacity;
-    }
-    .logo-display::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent);
-      transform: translateX(-100%);
-      pointer-events: none;
-      will-change: transform;
-    }
-    .logo-display svg { width: 70%; height: 70%; }
-
-    .logo-display.animated { animation: breathe 4s ease-in-out infinite; }
-    .logo-display.animated::before { animation: shimmer 3s ease-in-out infinite; }
-
-    @keyframes breathe {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.85; transform: scale(1.02); }
-    }
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
-    .links {
+    /* --- LINKS SECTION --- */
+    .links-wrapper {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      align-items: center;
+      gap: 16px;
     }
-    .social-btn {
+
+    .link-card {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      margin: 0 auto 12px;
-      padding: clamp(14px, 3vw, 18px) clamp(20px, 4vw, 24px);
-      border: 1px solid var(--accent-green);
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.4);
-      color: var(--text-primary);
-      font-size: clamp(14px, 2vw, 16px);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      padding: 18px 24px;
+      background: var(--bg-card);
+      border: var(--border);
+      border-radius: var(--radius);
       text-decoration: none;
+      color: var(--text-main);
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       position: relative;
       overflow: hidden;
-      min-height: 44px;
-    }
-    .social-btn i {
-      font-size: clamp(18px, 3vw, 24px);
-      color: var(--accent-green);
-    }
-    .social-btn[data-social="website"] i { color: var(--gold); }
-    .social-btn[data-social="threads"] i { color: #ffffff; }
-    .social-btn[data-social="instagram"] {
-      background: linear-gradient(135deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
-      border-color: rgba(255, 255, 255, 0.12);
-    }
-    .social-btn[data-social="instagram"] i { color: #fff; }
-    @media (hover: hover) {
-      .social-btn:hover {
-        background: rgba(0, 217, 102, 0.1);
-        border-color: var(--accent-green-light);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0, 217, 102, 0.15);
-      }
-    }
-    .social-btn:active {
-      transform: translateY(0);
-      background: rgba(0, 217, 102, 0.2);
-      transition-duration: var(--anim-fast);
-    }
-    @media (hover: none) {
-      .social-btn:active {
-        transform: none;
-      }
     }
 
-    #stickman-container {
-      position: relative;
-      width: 100%;
-      height: clamp(200px, 40vh, 300px);
-      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-      overflow: hidden;
-      margin-top: 40px;
-      border-top: 1px solid rgba(0, 217, 102, 0.2);
+    .link-card i {
+      font-size: 1.4rem;
+      width: 30px;
+      text-align: center;
+      margin-right: 15px;
+      color: var(--accent-primary);
+      transition: transform 0.3s ease;
     }
-    #stickman-canvas {
+
+    .link-card span {
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hover States */
+    .link-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px -10px var(--accent-glow);
+    }
+
+    .link-card:hover i {
+      transform: scale(1.2);
+      text-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    /* Small animated glow bar on the left */
+    .link-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .link-card:hover::before {
+      opacity: 1;
+    }
+
+    /* --- FULLSCREEN BACKGROUND CANVAS --- */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
-      background-position: bottom center;
-      background-repeat: no-repeat;
-      background-size: contain;
-      will-change: transform;
-      contain: layout paint;
-      backface-visibility: hidden;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    @media (min-width: 640px) {
-      body { padding: 30px; }
-      .wrapper { width: min(100%, 600px); }
-      .logo-display { width: 240px; }
-    }
-    @media (min-width: 768px) {
-      #stickman-container { height: 250px; }
-    }
-    @media (min-width: 960px) {
-      body { padding: 40px; }
-      .wrapper { width: min(100%, 800px); }
-      .logo-display { width: 250px; }
-      .social-btn { width: 60%; }
-    }
-    @media (min-width: 1024px) {
-      #stickman-container { height: 300px; }
+    .container {
+      position: relative;
+      z-index: 1;
     }
 
-    /* Dark preference support (no light variant needed) */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background-color: var(--bg-primary);
-        color: var(--text-primary);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .logo-display { animation: none !important; }
-      .logo-display::before { animation: none !important; }
-    }
-
-    /* Desktop hover pause */
-    @media (hover: hover) {
-      #logo-container:hover {
-        animation-play-state: paused;
-      }
+    /* --- RESPONSIVE --- */
+    @media (max-width: 480px) {
+      .container { padding-top: 40px; }
+      .logo-img { width: 150px; }
+      .link-card { padding: 16px 20px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <header>
-      <div class="logo-mark" aria-hidden="true">
-        <svg viewBox="0 0 120 120" role="presentation">
-          <rect x="18" y="18" width="84" height="84" rx="18" fill="rgba(10,14,39,0.6)" stroke="rgba(255,255,255,0.12)" stroke-width="3"></rect>
-          <path d="M38 78 L38 42 L52 58 L68 42 L68 78" stroke="#00ff7a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-          <circle cx="82" cy="60" r="9" fill="#d4a574"></circle>
-        </svg>
-      </div>
-      <div>
-        <h1 style="margin:0;">Kracked Devs</h1>
-        <p class="tagline">Cracking Code. Crafting Innovation.</p>
-      </div>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container">
+    <header class="brand-header">
+      <img src="KD Logo.png" alt="Kracked Devs Logo" class="logo-img">
+      <p class="tagline">Cracking Code. Crafting Innovation.</p>
     </header>
 
-    <main>
-      <div class="logo-display" id="logo-container" aria-hidden="true">
-        <svg viewBox="0 0 160 160" role="presentation">
-          <defs>
-            <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00d966" stop-opacity="0.9"></stop>
-              <stop offset="100%" stop-color="#0f1a3a" stop-opacity="0.95"></stop>
-            </linearGradient>
-          </defs>
-          <rect x="8" y="8" width="144" height="144" rx="26" fill="url(#lg)" stroke="rgba(255,255,255,0.08)" stroke-width="4"></rect>
-          <path d="M52 108 L52 52 L80 80 L108 52 L108 108" stroke="#e5e5e5" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-          <circle cx="80" cy="80" r="10" fill="#d4a574"></circle>
-        </svg>
-      </div>
+    <nav class="links-wrapper">
+      <a href="https://krackeddevs.com" target="_blank" class="link-card">
+        <i class="fa-solid fa-globe"></i>
+        <span>Official Website</span>
+      </a>
+      
+      <a href="https://x.com" target="_blank" class="link-card">
+        <i class="fa-brands fa-x-twitter"></i>
+        <span>X / Twitter</span>
+      </a>
 
-      <nav class="links" aria-label="Social links">
-        <a class="social-btn" data-social="website" href="https://krackeddevs.com" target="_blank" rel="noreferrer noopener">
-          <i class="fa-solid fa-circle-nodes"></i>
-          <span>Website</span>
-        </a>
-        <a class="social-btn" data-social="x" href="https://x.com" target="_blank" rel="noreferrer noopener">
-          <i class="fa-brands fa-x-twitter"></i>
-          <span>X / Twitter</span>
-        </a>
-        <a class="social-btn" data-social="discord" href="https://discord.com" target="_blank" rel="noreferrer noopener">
-          <i class="fa-brands fa-discord"></i>
-          <span>Discord</span>
-        </a>
-        <a class="social-btn" data-social="threads" href="https://www.threads.net" target="_blank" rel="noreferrer noopener">
-          <i class="fa-brands fa-threads"></i>
-          <span>Threads</span>
-        </a>
-        <a class="social-btn" data-social="instagram" href="https://www.instagram.com" target="_blank" rel="noreferrer noopener">
-          <i class="fa-brands fa-instagram"></i>
-          <span>Instagram</span>
-        </a>
-      </nav>
-    </main>
+      <a href="https://discord.com" target="_blank" class="link-card">
+        <i class="fa-brands fa-discord"></i>
+        <span>Discord Community</span>
+      </a>
 
-    <div id="stickman-container" aria-label="Stickman animation">
-      <canvas id="stickman-canvas" data-bg-src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0%200%20800%20200'%3E%3Cpath fill='%2300d966' fill-opacity='0.2' d='M350 20h36v160h-36zM414 12h36v168h-36zM368 0h8v20h-8zM432 0h8v24h-8z'/%3E%3C/svg%3E"></canvas>
-    </div>
+      <a href="https://instagram.com" target="_blank" class="link-card">
+        <i class="fa-brands fa-instagram"></i>
+        <span>Instagram</span>
+      </a>
+    </nav>
   </div>
 
+  <script src="https://unpkg.com/three@0.164.0/build/three.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const logo = document.getElementById('logo-container');
-      const canvas = document.getElementById('stickman-canvas');
-      const container = document.getElementById('stickman-container');
-      let ctx = null;
-      try {
-        ctx = canvas?.getContext('2d') || null;
-      } catch (err) {
-        ctx = null;
-      }
-      if (!canvas || !container || !ctx) {
-        if (container) container.style.display = 'none';
-        return;
-      }
-      const linksContainer = document.querySelector('.links');
-      const supportsVibrate = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
-      const AudioCtx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
-      let audioCtx;
-      const playBeep = () => {
-        if (!AudioCtx) return;
-        if (!audioCtx) audioCtx = new AudioCtx();
-        const ctx = audioCtx;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        gain.gain.value = 0.02;
-        osc.connect(gain).connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.05);
+    // Fullscreen neon circuit background using Three.js + GLSL
+    (() => {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas || !window.THREE) return;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+      const uniforms = {
+        u_time: { value: 0 },
+        u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
       };
 
-      // Utilities
-      const debounce = (fn, wait = 250) => {
-        let t;
-        return (...args) => {
-          clearTimeout(t);
-          t = setTimeout(() => fn(...args), wait);
-        };
-      };
-      const throttle = (fn, wait = 200) => {
-        let inFlight = false;
-        return (...args) => {
-          if (inFlight) return;
-          inFlight = true;
-          fn(...args);
-          setTimeout(() => { inFlight = false; }, wait);
-        };
-      };
-
-      // Logo animations: gate by reduced motion and start after load
-      const initLogoAnimations = () => {
-        if (!logo || prefersReducedMotion.matches) return;
-        requestAnimationFrame(() => logo.classList.add('animated'));
-
-        // Desktop hover pause for extra safety (CSS already handles it)
-        if (window.matchMedia('(hover: hover)').matches) {
-          logo.addEventListener('mouseenter', () => {
-            logo.style.animationPlayState = 'paused';
-          });
-          logo.addEventListener('mouseleave', () => {
-            logo.style.animationPlayState = 'running';
-          });
+      const vertexShader = `
+        void main() {
+          gl_Position = vec4(position, 1.0);
         }
-      };
+      `;
 
-      // Lazy-load background images (data-bg-src)
-      const initLazyBackgrounds = () => {
-        const targets = document.querySelectorAll('[data-bg-src]');
-        if (!targets.length) return;
+      const fragmentShader = `
+        precision highp float;
+        uniform float u_time;
+        uniform vec2 u_resolution;
 
-        const onIntersect = (entries, observer) => {
-          entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const el = entry.target;
-            const bg = el.getAttribute('data-bg-src');
-            if (bg) {
-              el.style.backgroundImage = `url("${bg}")`;
-              el.removeAttribute('data-bg-src');
-            }
-            observer.unobserve(el);
-          });
-        };
-
-        const observer = new IntersectionObserver(onIntersect, { rootMargin: '150px' });
-        targets.forEach(el => observer.observe(el));
-      };
-
-      const getCssVar = (name, fallback) => {
-        const val = getComputedStyle(document.documentElement).getPropertyValue(name);
-        return (val && val.trim()) || fallback;
-      };
-
-      const randInRange = (min, max) => Math.random() * (max - min) + min;
-
-      class StickmanAnimator {
-        constructor(canvas, color) {
-          this.canvas = canvas;
-          this.ctx = canvas.getContext('2d');
-          this.color = color;
-          this.dpr = 1;
-          this.width = 0;
-          this.height = 0;
-          this.anchorX = 0;
-          this.anchorY = 50;
-          this.ropeLen = 80;
-          this.maxAngle = Math.PI / 3; // 60deg
-          this.swingDuration = 2000;
-          this.traverseDuration = 8000;
-          this.traversalSpeed = 0;
-          this.swingPauseUntil = 0;
-          this.nextDisappearAt = 0;
-          this.invisibleUntil = 0;
-          this.visible = true;
-          this.lastTime = 0;
-          this.rafId = null;
-          this.reduced = false;
-          this.skylineCache = null;
-          this.offscreen = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : null;
-          this._tick = this._tick.bind(this);
-          this.resize();
-          this._resetDisappear(performance.now());
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
         }
 
-        resize() {
-          const rect = this.canvas.getBoundingClientRect();
-          this.dpr = Math.max(window.devicePixelRatio || 1, 1);
-          this.width = rect.width;
-          this.height = rect.height;
-          this.canvas.width = Math.max(1, Math.round(rect.width * this.dpr));
-          this.canvas.height = Math.max(1, Math.round(rect.height * this.dpr));
-          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-          this.anchorY = Math.max(40, this.height * 0.15);
-          this.ropeLen = Math.max(50, Math.min(this.height * 0.6, 90));
-          this.traversalSpeed = this.width / this.traverseDuration;
-          this._buildSkylineCache();
+        float gridLines(vec2 p, float scale) {
+          vec2 g = abs(fract(p / scale - 0.5) - 0.5) / fwidth(p / scale);
+          float line = 1.0 - min(min(g.x, g.y), 1.0);
+          return line;
         }
 
-        _buildSkylineCache() {
-          if (!this.width || !this.height) return;
-          const buffer = this.offscreen || document.createElement('canvas');
-          buffer.width = this.width;
-          buffer.height = this.height;
-          const bctx = buffer.getContext('2d');
-          bctx.clearRect(0, 0, this.width, this.height);
-          bctx.fillStyle = 'rgba(0, 217, 102, 0.2)';
-          // Twin towers minimal rectangles
-          bctx.fillRect(this.width * 0.42, this.height * 0.25, this.width * 0.04, this.height * 0.75);
-          bctx.fillRect(this.width * 0.54, this.height * 0.22, this.width * 0.04, this.height * 0.78);
-          bctx.fillRect(this.width * 0.445, this.height * 0.18, this.width * 0.01, this.height * 0.07);
-          bctx.fillRect(this.width * 0.56, this.height * 0.16, this.width * 0.01, this.height * 0.08);
-          this.skylineCache = buffer;
+        void main() {
+          vec2 uv = gl_FragCoord.xy;
+          vec2 res = u_resolution;
+          vec2 p = (uv - 0.5 * res) / res.y; // normalized, aspect-correct
+
+          // Base grid
+          float grid = gridLines(uv, 18.0);
+
+          // Secondary fine grid
+          float fine = gridLines(uv, 9.0) * 0.5;
+
+          // Flow direction and speed
+          float flow = sin((uv.x + uv.y) * 0.05 + u_time * 2.5);
+          float pulse = smoothstep(0.3, 0.7, flow);
+
+          // Ripple along lines
+          float ripple = sin(length(p) * 20.0 - u_time * 6.0) * 0.35 + 0.65;
+
+          // Combine intensity
+          float intensity = (grid + fine) * (0.35 + 0.65 * ripple) + 0.15 * pulse;
+          intensity = clamp(intensity, 0.0, 1.0);
+
+          vec3 base = vec3(0.0, 0.12, 0.08); // deep background tint
+          vec3 neon = vec3(0.0, 0.84, 0.40); // neon green
+          vec3 color = base + neon * intensity;
+
+          // Subtle vignette
+          float vignette = smoothstep(1.2, 0.3, length(p));
+          color *= vignette;
+
+          gl_FragColor = vec4(color, 1.0);
         }
+      `;
 
-        _resetDisappear(now) {
-          this.nextDisappearAt = now + randInRange(15000, 20000);
-        }
-
-        _resetTraversal(now) {
-          this.anchorX = 0;
-          this.swingPauseUntil = now + randInRange(2000, 5000);
-        }
-
-        _handleVisibility(now) {
-          if (this.visible && now >= this.nextDisappearAt) {
-            this.visible = false;
-            this.invisibleUntil = now + randInRange(2000, 4000);
-          } else if (!this.visible && now >= this.invisibleUntil) {
-            this.visible = true;
-            this.anchorX = Math.random() < 0.5 ? this.width * 0.15 : this.width * 0.85;
-            this.swingPauseUntil = now + randInRange(2000, 5000);
-            this._resetDisappear(now);
-          }
-        }
-
-        update(delta, now) {
-          this._handleVisibility(now);
-
-          if (this.visible) {
-            this.anchorX += this.traversalSpeed * delta;
-            if (this.anchorX > this.width) {
-              this._resetTraversal(now);
-            }
-          }
-
-          const swinging = now >= this.swingPauseUntil;
-          this.angle = swinging
-            ? Math.sin((now % this.swingDuration) * Math.PI / this.swingDuration) * this.maxAngle
-            : 0;
-        }
-
-        draw(alpha = 1) {
-          const ctx = this.ctx;
-          ctx.clearRect(0, 0, this.width, this.height);
-          if (this.skylineCache) {
-            ctx.drawImage(this.skylineCache, 0, 0, this.width, this.height);
-          }
-          const opacity = this.visible ? alpha : 0;
-          if (opacity === 0) return;
-
-          const headR = 8;
-          const bodyLen = 20;
-          const armLen = 12;
-          const legLen = 16;
-          const anchorX = this.anchorX;
-          const anchorY = this.anchorY;
-          const angle = this.angle || 0;
-
-          const sinA = Math.sin(angle);
-          const cosA = Math.cos(angle);
-          const headX = anchorX + sinA * this.ropeLen;
-          const headY = anchorY + cosA * this.ropeLen;
-          const shoulderY = headY + headR + 2;
-          const hipY = headY + headR + bodyLen;
-
-          ctx.strokeStyle = this.color;
-          ctx.lineWidth = 2;
-          ctx.lineCap = 'round';
-          ctx.globalAlpha = opacity;
-
-          // Rope/Web
-          ctx.beginPath();
-          ctx.moveTo(anchorX, anchorY);
-          ctx.lineTo(headX, headY);
-          ctx.stroke();
-
-          // Head
-          ctx.beginPath();
-          ctx.arc(headX, headY, headR, 0, Math.PI * 2);
-          ctx.stroke();
-
-          // Body
-          ctx.beginPath();
-          ctx.moveTo(headX, headY + headR);
-          ctx.lineTo(headX, hipY);
-          ctx.stroke();
-
-          // Arms
-          ctx.beginPath();
-          ctx.moveTo(headX, shoulderY);
-          ctx.lineTo(headX - armLen, shoulderY + armLen * 0.5);
-          ctx.moveTo(headX, shoulderY);
-          ctx.lineTo(headX + armLen, shoulderY + armLen * 0.5);
-          ctx.stroke();
-
-          // Legs
-          ctx.beginPath();
-          ctx.moveTo(headX, hipY);
-          ctx.lineTo(headX - legLen, hipY + legLen * 0.8);
-          ctx.moveTo(headX, hipY);
-          ctx.lineTo(headX + legLen, hipY + legLen * 0.8);
-          ctx.stroke();
-
-          ctx.globalAlpha = 1;
-        }
-
-        _tick(now) {
-          if (this.reduced) {
-            this.draw(1);
-            return;
-          }
-          if (!this.lastTime) {
-            this.lastTime = now;
-            this._resetTraversal(now);
-          }
-          const delta = now - this.lastTime;
-          this.lastTime = now;
-          this.update(delta, now);
-          this.draw(1);
-          this.rafId = requestAnimationFrame(this._tick);
-        }
-
-        start() {
-          if (this.reduced || this.rafId) return;
-          this.lastTime = 0;
-          this.rafId = requestAnimationFrame(this._tick);
-        }
-
-        stop() {
-          if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-          }
-        }
-
-        drawStatic() {
-          this.stop();
-          this.visible = true;
-          this.angle = 0;
-          this.draw(1);
-        }
-
-        setReducedMotion(flag) {
-          this.reduced = flag;
-          if (flag) {
-            this.drawStatic();
-          } else {
-            this.start();
-          }
-        }
-      }
-
-      const stickman = new StickmanAnimator(canvas, getCssVar('--accent-green', '#00d966'));
-      let lastW = 0;
-      let lastH = 0;
-
-      const resizeCanvas = () => {
-        const rect = container.getBoundingClientRect();
-        const changed = rect.width !== lastW || rect.height !== lastH;
-        if (!changed) return;
-        lastW = rect.width;
-        lastH = rect.height;
-        stickman.resize();
-        if (prefersReducedMotion.matches) {
-          stickman.drawStatic();
-        }
-        stickman._buildSkylineCache();
-      };
-
-      const debouncedResize = debounce(resizeCanvas, 250);
-
-      // Optional scroll handler placeholder (throttled) for future parallax
-      const onScroll = throttle(() => {
-        // reserved for future parallax/metrics work
-      }, 200);
-
-      const applyMotionPreference = () => {
-        const reduced = prefersReducedMotion.matches;
-        stickman.setReducedMotion(reduced);
-        if (logo && reduced) {
-          logo.classList.remove('animated');
-          logo.style.animation = 'none';
-        } else {
-          initLogoAnimations();
-        }
-      };
-
-      // Init
-      resizeCanvas();
-      initLazyBackgrounds();
-      initLogoAnimations();
-      if (!prefersReducedMotion.matches) stickman.start();
-      else stickman.drawStatic();
-
-      window.addEventListener('resize', debouncedResize);
-      window.addEventListener('scroll', onScroll, { passive: true });
-      prefersReducedMotion.addEventListener('change', applyMotionPreference);
-
-      // Delegated social click: haptics + optional beep + navigation
-      if (linksContainer) {
-        linksContainer.addEventListener('click', event => {
-          const link = event.target.closest('.social-btn');
-          if (!link) return;
-
-          const href = link.getAttribute('href');
-          const target = link.getAttribute('target');
-          const rel = link.getAttribute('rel') || '';
-          const tag = link.dataset.social;
-
-          if (supportsVibrate) navigator.vibrate(50);
-          playBeep();
-
-          if (href) {
-            event.preventDefault();
-            setTimeout(() => {
-              if (target === '_blank') {
-                const features = rel.includes('noopener') ? 'noopener' : '';
-                window.open(href, '_blank', features);
-              } else {
-                window.location.href = href;
-              }
-            }, 75);
-          }
-        });
-
-        linksContainer.addEventListener('keydown', event => {
-          if (event.key !== 'Enter' && event.key !== ' ') return;
-          const link = event.target.closest('.social-btn');
-          if (!link) return;
-          if (supportsVibrate) navigator.vibrate(50);
-          playBeep();
-        });
-      }
-
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          stickman.stop();
-        } else if (!prefersReducedMotion.matches) {
-          stickman.start();
-        } else {
-          stickman.drawStatic();
-        }
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader,
       });
 
-    });
+      const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+      scene.add(quad);
+
+      function onResize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        renderer.setSize(w, h, false);
+        uniforms.u_resolution.value.set(w, h);
+      }
+
+      function animate(t) {
+        uniforms.u_time.value = t * 0.001;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', onResize);
+      onResize();
+      requestAnimationFrame(animate);
+    })();
   </script>
 </body>
 </html>
